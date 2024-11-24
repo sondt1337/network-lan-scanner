@@ -2,3 +2,6 @@ ipaddress
 tabulate
 netifaces
 requests
+getmac
+ping3
+scapy
