@@ -1,12 +1,10 @@
+import subprocess
 import socket
-import platform
-import time
 import requests
-import netifaces
-from ping3 import ping
-from scapy.all import ARP, Ether, srp
 import logging
+import time
 from getmac import get_mac_address
+
 
 class DeviceInfo:
     def __init__(self):
@@ -17,10 +15,15 @@ class DeviceInfo:
 
     def check_device_alive(self, ip):
         try:
-            response = ping(str(ip), timeout=self.timeout)
-            if response is not None:
+            # Thực hiện lệnh ping qua hệ điều hành
+            param = "-n" if platform.system().lower() == "windows" else "-c"
+            command = ["ping", param, "1", "-W", str(int(self.timeout * 1000)) if platform.system().lower() != "windows" else str(int(self.timeout)), str(ip)]
+
+            result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            if result.returncode == 0:
                 return True
 
+            # Thử kiểm tra các cổng phổ biến nếu lệnh ping không thành công
             common_ports = [80, 443, 22, 8080]
             for port in common_ports:
                 try:
