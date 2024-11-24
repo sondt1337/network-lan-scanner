@@ -21,5 +21,5 @@ def get_local_mac():
                 if mac and mac != "00:00:00:00:00:00":
                     return mac.upper()
     except Exception as e:
-        print(f"Lỗi khi lấy MAC local: {str(e)}")
+        print(f"Error when getting local MAC: {str(e)}")
     return None
