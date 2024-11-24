@@ -1,4 +1,4 @@
-# Network Scanner
+# network-lan-scanner
 
 A powerful Python-based network scanning tool that detects and analyzes devices on your local network.
 
