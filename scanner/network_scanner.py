@@ -71,7 +71,7 @@ class NetworkScanner:
             for future in as_completed(futures):
                 try:
                     result = future.result()
-                    if result:
+                    if result and (result['mac'] != "N/A" or result['ports'] != "N/A"):
                         self.results.append(result)
                         self.devices_found += 1
                 except Exception:
