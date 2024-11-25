@@ -4,7 +4,7 @@ import requests
 import logging
 import time
 from getmac import get_mac_address
-
+import platform
 
 class DeviceInfo:
     def __init__(self):
