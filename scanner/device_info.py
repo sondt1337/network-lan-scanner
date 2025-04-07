@@ -15,16 +15,8 @@ class DeviceInfo:
 
     def check_device_alive(self, ip):
         try:
-            # Thực hiện lệnh ping qua hệ điều hành
-            param = "-n" if platform.system().lower() == "windows" else "-c"
-            command = ["ping", param, "1", "-W", str(int(self.timeout * 1000)) if platform.system().lower() != "windows" else str(int(self.timeout)), str(ip)]
-
-            result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            if result.returncode == 0:
-                return True
-
-            # Thử kiểm tra các cổng phổ biến nếu lệnh ping không thành công
-            common_ports = [80, 443, 22, 8080]
+            # First try with socket connections to common ports
+            common_ports = [80, 443, 22, 8080, 53, 3389, 445, 139, 21, 23, 5000]
             for port in common_ports:
                 try:
                     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
@@ -33,6 +25,30 @@ class DeviceInfo:
                             return True
                 except:
                     continue
+            
+            # If socket connections fail, try ping
+            param = "-n" if platform.system().lower() == "windows" else "-c"
+            timeout_param = "-w" if platform.system().lower() == "windows" else "-W"
+            timeout_value = str(int(self.timeout * 1000)) if platform.system().lower() == "windows" else str(int(self.timeout))
+            
+            command = ["ping", param, "1", timeout_param, timeout_value, str(ip)]
+            
+            result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            if result.returncode == 0:
+                return True
+                
+            # Try ARP scan as a last resort
+            try:
+                if platform.system().lower() == "windows":
+                    # On Windows, check ARP table
+                    arp_result = subprocess.run(["arp", "-a", str(ip)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    output = arp_result.stdout.decode('utf-8', errors='ignore')
+                    # If the IP is in the ARP table and doesn't show as "dynamic"
+                    if str(ip) in output and not "ff-ff-ff-ff-ff-ff" in output.lower():
+                        return True
+            except:
+                pass
+                
             return False
         except Exception as e:
             logging.error(f"Error checking if device is alive: {e}")

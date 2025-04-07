@@ -1,7 +1,8 @@
 ipaddress
-tabulate
 netifaces
 requests
+tabulate
+tqdm
 getmac
 ping3
 scapy
