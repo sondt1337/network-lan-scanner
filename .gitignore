@@ -2,3 +2,4 @@
 /utils/__pycache__
 /config/__pycache__
 *.pyc
+/results
