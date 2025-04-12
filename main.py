@@ -13,6 +13,7 @@ def banner():
     print("Developed by: sondt\n")
 
 def main():
+    banner()
     while True:
         print("=== Select an option ===")
         print("1. Scan Local Network - Discover all active hosts")
