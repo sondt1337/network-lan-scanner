@@ -1,64 +1,60 @@
 import os
-import argparse
-from scanner.network_scanner import NetworkScanner
-from utils.network_utils import get_local_networks
+def banner():
+    """Display the application banner"""
+    print(r"""
+            _                                         
+           | |                                        
+ _ __   ___| |_   ___  ___ __ _ _ __  _ __   ___ _ __ 
+| '_ \ / _ \ __| / __|/ __/ _` | '_ \| '_ \ / _ \ '__|
+| | | |  __/ |_  \__ \ (_| (_| | | | | | | |  __/ |   
+|_| |_|\___|\__| |___/\___\__,_|_| |_|_| |_|\___|_|   
+                                                                                                         
+    """)
+    print("Developed by: sondt\n")
 
 def main():
-    parser = argparse.ArgumentParser(description="Advanced Network Scanner")
-    parser.add_argument("-n", "--network", help="Network to scan (CIDR format, e.g., 192.168.1.0/24)")
-    parser.add_argument("-t", "--threads", type=int, default=50, help="Number of threads (default: 50)")
-    parser.add_argument("-o", "--output", choices=["json", "csv", "txt"], help="Export format (json, csv, txt)")
-    parser.add_argument("-d", "--output-dir", default="scan_results", help="Output directory for scan results")
-    parser.add_argument("-T", "--timeout", type=float, default=0.5, help="Scan timeout in seconds (default: 0.5)")
-    
-    args = parser.parse_args()
-    
-    try:
-        print("\n=== Advanced Network Scanner v4.0 ===")
-        
-        if args.network:
-            network = args.network
-        else:
-            networks = get_local_networks()
-            
-            if not networks:
-                print("No network found!")
-                return
-    
-            print("\nAvailable networks:")
-            for idx, net in enumerate(networks, 1):
-                print(f"{idx}. {net['network']} (Interface: {net['interface']})")
-    
-            while True:
-                try:
-                    choice = int(input("\nSelect network to scan (enter number): ")) - 1
-                    if 0 <= choice < len(networks):
-                        network = networks[choice]['network']
-                        break
-                    print("Invalid choice!")
-                except ValueError:
-                    print("Please enter a number!")
-        
-        # Create output directory if it doesn't exist
-        if args.output and not os.path.exists(args.output_dir):
-            os.makedirs(args.output_dir)
-        
-        scanner = NetworkScanner(
-            network=network, 
-            num_threads=args.threads,
-            scan_timeout=args.timeout,
-            output_dir=args.output_dir
-        )
-        
-        scanner.scan(export_format=args.output)
-        
-        if args.output:
-            print(f"\nResults exported to {args.output_dir} directory in {args.output} format.")
+    while True:
+        print("=== Select an option ===")
+        print("1. Scan Local Network - Discover all active hosts")
+        print("2. Host Scanner - Scan specific hosts (local & remote)")
+        print("0. Exit")
 
-    except KeyboardInterrupt:
-        print("\n\nScanning stopped by user!")
-    except Exception as e:
-        print(f"\nError: {e}")
+        choice = input("Your choice: ")
+
+        if choice == "1":
+            os.system("python lan_scanner.py")
+
+        elif choice == "2":
+            target = input("Enter target (IP or domain): ")
+            ports = input("Enter port range (default 1-1000): ") or "1-1000"
+
+            args = f"-t {target} -p {ports}"
+
+            if input("Enable verbose output? (y/n): ").lower() == "y":
+                args += " -v"
+            if input("Enable OS detection? (y/n): ").lower() == "y":
+                args += " --os-detection"
+            if input("Enable Service detection? (y/n): ").lower() == "y":
+                args += " --service-detection"
+
+            timeout = input("Set timeout (default 1.0s, Enter to skip): ")
+            if timeout:
+                args += f" --timeout {timeout}"
+
+            threads = input("Set threads (default 100, Enter to skip): ")
+            if threads:
+                args += f" -T {threads}"
+
+            cmd = f"python host_scanner.py {args}"
+            print(f"Running: {cmd}")
+            os.system(cmd)
+
+        elif choice == "0":
+            print("Goodbye!")
+            break
+
+        else:
+            print("Invalid choice! Please select again.")
 
 if __name__ == "__main__":
     main()
