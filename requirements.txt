@@ -6,3 +6,9 @@ tqdm
 getmac
 ping3
 scapy
+argparse
+datetime
+scapy
+requests
+cryptography
+pyOpenSSL
