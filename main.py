@@ -1,4 +1,6 @@
 import os
+import sys
+
 def banner():
     """Display the application banner"""
     print(r"""
@@ -23,7 +25,7 @@ def main():
         choice = input("Your choice: ")
 
         if choice == "1":
-            os.system("python lan_scanner.py")
+            os.system(f"{sys.executable} lan_scanner.py")
 
         elif choice == "2":
             target = input("Enter target (IP or domain): ")
@@ -46,7 +48,7 @@ def main():
             if threads:
                 args += f" -T {threads}"
 
-            cmd = f"python host_scanner.py {args}"
+            cmd = f"{sys.executable} host_scanner.py {args}"
             print(f"Running: {cmd}")
             os.system(cmd)
 
