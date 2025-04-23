@@ -4,3 +4,4 @@
 *.pyc
 /results
 /scan_results
+*.pyc
