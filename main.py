@@ -40,8 +40,9 @@ def main():
     banner()
     while True:
         print("=== Select an option ===")
-        print("1. Scan Local Network - Discover all active hosts")
+        print("1. Scan Local Network - Discover all active hosts (local)")
         print("2. Host Scanner - Scan specific hosts (local & remote)")
+        print("3. Camera Scanner - Scan specific cameras (local & remote)")
         print("0. Exit")
 
         choice = input("Your choice: ")
@@ -51,12 +52,17 @@ def main():
             cmd = f"{sys.executable} lan_scanner.py {args}"
             print(f"Running: {cmd}")
             os.system(cmd)
+        
+        if choice == "3":
+            cmd = f"{sys.executable} camera_scanner.py"
+            print(f"Running: {cmd}")
+            os.system(cmd)
 
         elif choice == "2":
             target = input("Enter target (IP or domain): ")
             ports = input("Enter port range (default 1-1000): ") or "1-1000"
 
-            args = f"-t {target} -p {ports} " + build_args_common()
+            args = f"-t {target} -p {ports} "
 
             if input("Enable verbose output? (y/n): ").lower() == "y":
                 args += " -v"
